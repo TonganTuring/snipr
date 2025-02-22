@@ -1,14 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 
+interface PodcastItem {
+  title: string;
+  description: string;
+  audioUrl: string;
+  length: number;
+  guid: string;
+  pubDate: string;
+  duration: string;
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { userId: string; feedId: string } }
-) {
+  request: NextRequest,
+): Promise<NextResponse> {
   try {
-    // Await and destructure params at the start
-    const { userId, feedId } = await Promise.resolve(params);
+    // Extract params from the URL
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const userId = pathParts[pathParts.length - 2];
+    const feedId = pathParts[pathParts.length - 1];
     
     console.log('RSS feed requested for user:', userId, 'with feedId:', feedId);
     
@@ -58,7 +70,7 @@ export async function GET(
     <itunes:category text="Personal"/>
     <itunes:explicit>false</itunes:explicit>
     <generator>Snipr Audio Converter</generator>
-    ${userData.podcastItems?.map((item: any) => `
+    ${userData.podcastItems?.map((item: PodcastItem) => `
       <item>
         <title>${item.title}</title>
         <description><![CDATA[${item.description}]]></description>

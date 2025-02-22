@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { updateProfile, updateEmail, User } from 'firebase/auth';
+import { updateProfile, updateEmail } from 'firebase/auth';
 import Image from 'next/image';
 
 export default function Settings() {
@@ -30,8 +30,6 @@ export default function Settings() {
     setMessage({ type: '', text: '' });
 
     try {
-      const updates: Partial<User> = {};
-      
       // Update display name and photo URL if changed
       if (displayName !== user.displayName || photoURL !== user.photoURL) {
         await updateProfile(user, {
