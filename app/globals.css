@@ -19,8 +19,18 @@ body {
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
   }
+
+  h1 {
+    @apply bg-gradient-to-r from-[#68D3FF] to-[#4DFFA2] bg-clip-text text-transparent;
+  }
   
   button {
     @apply transition-all duration-200;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-emerald-500 to-blue-500 text-white px-6 py-2 rounded-full font-medium hover:opacity-90 transition-opacity;
   }
 }
