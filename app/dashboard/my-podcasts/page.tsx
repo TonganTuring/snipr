@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { Suspense, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PodcastItem } from '@/app/types/podcast';
 import { PodcastEpisodeCard } from '@/app/components/PodcastEpisodeCard';
 import { LoadingFeed } from './components/LoadingFeed';

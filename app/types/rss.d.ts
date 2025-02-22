@@ -12,6 +12,15 @@ declare module 'rss' {
     categories?: string[];
     pubDate?: string;
     ttl?: number;
+    customNamespaces?: {
+      [key: string]: string;
+    };
+    custom_elements?: Array<{
+      [key: string]: Array<{
+        _attr?: { [key: string]: string };
+        _text?: string;
+      }>;
+    }>;
   }
 
   interface RSSItemOptions {
@@ -25,7 +34,12 @@ declare module 'rss' {
       url: string;
       type: string;
     };
-    custom_elements?: Array<Record<string, any>>;
+    custom_elements?: Array<{
+      [key: string]: Array<{
+        _attr?: { [key: string]: string };
+        _text?: string;
+      }>;
+    }>;
   }
 
   class RSS {
