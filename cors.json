@@ -1,0 +1,20 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://snipr.vercel.app"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Authorization",
+      "Content-Length",
+      "User-Agent",
+      "x-goog-*",
+      "x-goog-meta-*",
+      "x-goog-storage-class",
+      "accept",
+      "origin",
+      "access-control-request-method",
+      "access-control-request-headers"
+    ]
+  }
+] 

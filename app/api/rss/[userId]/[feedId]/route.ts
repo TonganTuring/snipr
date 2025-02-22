@@ -65,7 +65,7 @@ export async function GET(
       <itunes:name>${userData.displayName}</itunes:name>
       <itunes:email>${userData.email}</itunes:email>
     </itunes:owner>
-    <itunes:image href="${userData.photoURL || 'https://snipr.com/default-podcast-image.jpg'}"/>
+    <itunes:image href="${userData.podcastImageURL || 'https://snipr.com/default-podcast-image.jpg'}"/>
     <itunes:summary><![CDATA[This is ${userData.displayName}'s personal Snipr feed, where text content is transformed into audio for convenient listening. Powered by Snipr's AI technology, this feed contains converted articles, books, and videos that ${userData.displayName} has chosen to listen to rather than read.]]></itunes:summary>
     <itunes:category text="Personal"/>
     <itunes:explicit>false</itunes:explicit>
