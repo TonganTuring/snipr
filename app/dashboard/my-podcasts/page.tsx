@@ -1,101 +1,141 @@
-import Image from 'next/image';
+'use client';
 
-interface PodcastCard {
+import Image from 'next/image';
+import { Suspense, useState, useEffect } from 'react';
+import { PodcastItem } from '@/app/types/podcast';
+import { PodcastEpisodeCard } from '@/app/components/PodcastEpisodeCard';
+import { LoadingFeed } from './components/LoadingFeed';
+import { useAuth } from '@/app/context/AuthContext';
+import Parser from 'rss-parser';
+
+interface PodcastFeed {
   title: string;
   description: string;
   category: string;
   image: string;
   frequency?: string;
+  items?: PodcastItem[];
+}
+
+const parser = new Parser();
+
+async function getPodcasts(rssFeedUrl: string | null): Promise<PodcastFeed[]> {
+  if (!rssFeedUrl) {
+    return [];
+  }
+
+  try {
+    const response = await fetch(rssFeedUrl, { 
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+      },
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to fetch podcasts: ${response.statusText}`);
+    }
+
+    const feedText = await response.text();
+    const feed = await parser.parseString(feedText);
+    
+    return [{
+      title: feed.title || 'My Personal Feed',
+      description: feed.description || '',
+      category: feed.categories?.[0] || 'Personal', 
+      image: feed.image?.url || '/placeholder.jpg',
+      frequency: 'Updated regularly',
+      items: feed.items?.map(item => ({
+        title: item.title || '',
+        description: item.description || '',
+        audioUrl: item.enclosure?.url || '',
+        length: item.enclosure?.length || 0,
+        guid: item.guid || '',
+        pubDate: item.pubDate || '',
+        duration: item.itunes?.duration || '',
+        link: item.link,
+        enclosure: {
+          url: item.enclosure?.url || '',
+          length: item.enclosure?.length || 0,
+          type: item.enclosure?.type || ''
+        },
+        itunes: {
+          duration: item.itunes?.duration,
+          summary: item.itunes?.summary,
+          explicit: item.itunes?.explicit,
+          image: item.itunes?.image,
+          author: item.itunes?.author
+        }
+      }))
+    }];
+  } catch (error) {
+    console.error('Error fetching podcasts:', error);
+    return [];
+  }
+}
+
+function PodcastList() {
+  const { rssFeedUrl } = useAuth();
+  const [podcasts, setPodcasts] = useState<PodcastFeed[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPodcasts() {
+      const results = await getPodcasts(rssFeedUrl);
+      setPodcasts(results);
+      setIsLoading(false);
+    }
+
+    fetchPodcasts();
+  }, [rssFeedUrl]);
+
+  if (isLoading) {
+    return <LoadingFeed />;
+  }
+  
+  const episodes = podcasts
+    .flatMap((podcast: PodcastFeed) => podcast.items || [])
+    .sort((a: PodcastItem, b: PodcastItem) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+
+  if (episodes.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-gray-400 text-lg mb-4">
+          No episodes found
+        </p>
+        <p className="text-gray-500 text-sm">
+          Add content from the dashboard to start building your feed
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-4">
+      {episodes.map((episode: PodcastItem, index: number) => (
+        <PodcastEpisodeCard 
+          key={episode.guid || `${episode.title}-${index}`} 
+          episode={episode} 
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function MyPodcasts() {
-  const featuredPodcasts: PodcastCard[] = [
-    {
-      title: "UNBELIEVABLY TRUE",
-      description: "A woman turns the tables on a con man, exposing his lies.",
-      category: "True Crime",
-      image: "/placeholder-pink.jpg"
-    }
-  ];
-
-  const newPodcasts: PodcastCard[] = [
-    {
-      title: "Baby Broker",
-      description: "The BINGE Cases",
-      category: "True Crime",
-      frequency: "Weekly Series",
-      image: "/placeholder1.jpg"
-    },
-    {
-      title: "The White Lotus",
-      description: "HBO Original Official Podcast",
-      category: "TV & Film",
-      frequency: "Weekly Series",
-      image: "/placeholder2.jpg"
-    },
-    {
-      title: "Crafty Chronicles",
-      description: "DIY & Creativity",
-      category: "Crafts",
-      frequency: "Updated Weekly",
-      image: "/placeholder3.jpg"
-    },
-    {
-      title: "The Deadly Seven",
-      description: "True Crime Stories",
-      category: "True Crime",
-      frequency: "Updated Weekly",
-      image: "/placeholder4.jpg"
-    }
-  ];
-
   return (
     <div className="min-h-screen text-white p-8">
-      <h1 className="text-4xl font-bold mb-8">My Podcasts</h1>
-      {/* Featured Section */}
-      <div className="mb-12">
-        <div className="relative group cursor-pointer overflow-hidden rounded-xl">
-          <div className="aspect-[16/9] relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
-            <Image
-              src={featuredPodcasts[0].image}
-              alt={featuredPodcasts[0].title}
-              fill
-              className="object-cover"
-              priority={true}
-            />
-            <div className="absolute bottom-0 left-0 p-6 z-20">
-              <p className="text-sm font-medium text-gray-300 mb-2">{featuredPodcasts[0].category}</p>
-              <h2 className="text-2xl font-bold mb-2">{featuredPodcasts[0].title}</h2>
-              <p className="text-gray-300">{featuredPodcasts[0].description}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* New & Noteworthy Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-6">New & Noteworthy</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {newPodcasts.map((podcast, index) => (
-            <div key={index} className="group cursor-pointer">
-              <div className="aspect-square relative rounded-lg overflow-hidden mb-4">
-                <Image
-                  src={podcast.image}
-                  alt={podcast.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">{podcast.title}</h3>
-                <p className="text-sm text-gray-400">{podcast.category}</p>
-                <p className="text-sm text-gray-400">{podcast.frequency}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold">My Podcasts</h1>
+        <p className="text-gray-400 mt-2">
+          Listen to your personalized audio content
+        </p>
+      </header>
+      
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-6">Personal Feed</h2>
+        <PodcastList />
+      </section>
     </div>
   );
 }

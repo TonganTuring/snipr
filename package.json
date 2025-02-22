@@ -17,6 +17,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-firebase-hooks": "^5.1.1",
+    "rss-parser": "^3.13.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
