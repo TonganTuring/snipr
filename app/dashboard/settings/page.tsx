@@ -6,12 +6,13 @@ import { updateProfile, updateEmail, User } from 'firebase/auth';
 import Image from 'next/image';
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, rssFeedUrl } = useAuth();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -56,12 +57,46 @@ export default function Settings() {
     }
   };
 
+  const copyToClipboard = async () => {
+    if (rssFeedUrl) {
+      try {
+        await navigator.clipboard.writeText(rssFeedUrl);
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  };
+
   if (!user) return null;
 
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-4xl font-bold mb-8">Settings</h1>
       
+      {/* RSS Feed URL Section */}
+      <div className="mb-8 p-6 bg-gray-800/50 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Your Personal Podcast Feed</h2>
+        <p className="text-gray-300 mb-4">
+          Use this RSS feed URL to subscribe to your personal podcast feed in any podcast player:
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={rssFeedUrl || ''}
+            readOnly
+            className="flex-1 bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-sm"
+          />
+          <button
+            onClick={copyToClipboard}
+            className="btn-primary whitespace-nowrap"
+          >
+            {copySuccess ? 'Copied!' : 'Copy URL'}
+          </button>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Profile Picture */}
         <div className="flex items-center space-x-4">
