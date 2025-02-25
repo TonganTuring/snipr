@@ -6,7 +6,7 @@ export interface PodcastItem {
   guid: string;
   pubDate: string;
   duration: string;
-  link?: string;
+  link?: string | null;
   enclosure?: {
     url: string;
     length: number;
@@ -16,7 +16,7 @@ export interface PodcastItem {
     duration?: string;
     summary?: string;
     explicit?: string;
-    image?: string;
-    author?: string;
+    image?: string | null;
+    author?: string | null;
   };
 } 

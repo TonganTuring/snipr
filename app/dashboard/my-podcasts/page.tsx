@@ -6,6 +6,7 @@ import { PodcastEpisodeCard } from '@/app/components/PodcastEpisodeCard';
 import { LoadingFeed } from './components/LoadingFeed';
 import { useAuth } from '@/app/context/AuthContext';
 import Parser from 'rss-parser';
+import { auth } from '@/app/firebase/config';
 
 interface PodcastFeed {
   title: string;
@@ -27,7 +28,8 @@ async function getPodcasts(rssFeedUrl: string | null): Promise<PodcastFeed[]> {
     const response = await fetch(rssFeedUrl, { 
       cache: 'no-store',
       headers: {
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+        'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}`
       },
     });
   
@@ -62,7 +64,7 @@ async function getPodcasts(rssFeedUrl: string | null): Promise<PodcastFeed[]> {
           duration: item.itunes?.duration,
           summary: item.itunes?.summary,
           explicit: item.itunes?.explicit,
-          image: item.itunes?.image,
+          image: item.itunes?.image || feed.image?.url,
           author: item.itunes?.author
         }
       }))
