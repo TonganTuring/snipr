@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
-import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 import { v4 as uuidv4 } from 'uuid';
 import { adminAuth, adminDb } from '../../firebase/admin';

@@ -31,9 +31,7 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ['fs-extra']
-  }
+  serverExternalPackages: ['fs-extra']
 };
 
 export default nextConfig;

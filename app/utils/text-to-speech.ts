@@ -90,11 +90,11 @@ export async function convertTextToSpeech(
       });
       
       // Add event handlers
-      synthesizer.synthesisCompleted = (s: sdk.SpeechSynthesizer, e: sdk.SpeechSynthesisEventArgs) => {
+      synthesizer.synthesisCompleted = () => {
         console.log('Synthesis completed event received');
       };
       
-      synthesizer.synthesisStarted = (s: sdk.SpeechSynthesizer, e: sdk.SpeechSynthesisEventArgs) => {
+      synthesizer.synthesisStarted = () => {
         console.log('Synthesis started event received');
       };
       
